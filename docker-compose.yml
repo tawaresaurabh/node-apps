@@ -1,0 +1,64 @@
+version: '3'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    networks:
+      - backend    
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  mongo:
+    image: mongo
+    container_name: mongo-db
+    networks:
+      - backend   
+    ports:
+      - "27017-27019:27017-27019"
+
+  api1:
+    image: node-app1
+    build: ./node-app1
+    networks:
+      - backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./node-app1:/usr/src/app
+    environment:
+      WAIT_HOSTS: rabbitmq:5672, mongo:27017
+      WAIT_AFTER_HOSTS : 20
+    command: sh -c "/wait && npm install && npm run dev"      
+
+
+  api2:
+    image: node-app2
+    build: ./node-app2
+    networks:
+      - backend
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./node-app2:/usr/src/app
+    environment:
+      WAIT_HOSTS: rabbitmq:5672, mongo:27017
+      WAIT_AFTER_HOSTS : 20
+    command: sh -c "/wait && npm install && npm run dev"          
+
+
+  web-cli1:
+    image: node-app1
+    networks:
+      - backend
+    command: sh
+
+  web-cli2:
+    image: node-app2
+    networks:
+      - backend
+    command: sh
+
+networks:
+  backend:
+    driver: bridge
