@@ -30,13 +30,15 @@ const requestListener = function (req, res) {
 };
 
 app.use("/test", (req, res) => {
+
+	const data = req.query.data || "";
 	channel.then((response) => {
 		response.sendToQueue(
 			orderGenerationQueue,
-			Buffer.from(JSON.stringify({ data: "test" }))
+			Buffer.from(JSON.stringify({ data }))
 		);
 	});
-	console.log("Test sent server 2");
+	console.log(`Server 1 sent ${{data}} to server 2`);
 	res.end();
 });
 app.use("/order", orderRouter);
