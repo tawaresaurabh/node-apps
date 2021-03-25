@@ -2,63 +2,72 @@ version: '3'
 services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: rabbitmq
-    networks:
-      - backend    
+    container_name: rabbit-mq
     ports:
       - "5672:5672"
-      - "15672:15672"
+      - 15672:15672
+    networks:
+      - backend
 
-  mongo:
+  mongodb:
+    container_name: mongodb 
     image: mongo
-    container_name: mongo-db
-    networks:
-      - backend   
     ports:
-      - "27017-27019:27017-27019"
-
-  api1:
-    image: node-app1
-    build: ./node-app1
+      - "27017:27017"
     networks:
       - backend
+
+  server1:
+    container_name: server-1
+    restart: always
+    build: ./server-1
+    volumes: # Dev Mode
+      - ./server-1/:/usr/src/app/ # Dev Mode
     ports:
-      - "8080:8080"
-    volumes:
-      - ./node-app1:/usr/src/app
+      - "5001:5001"
     environment:
-      WAIT_HOSTS: rabbitmq:5672, mongo:27017
-      WAIT_AFTER_HOSTS : 20
-    command: sh -c "/wait && npm install && npm run dev"      
-
-
-  api2:
-    image: node-app2
-    build: ./node-app2
+      WAIT_HOSTS: rabbitmq:5672, mongodb:27017
+      WAIT_AFTER_HOSTS : 20 
+    depends_on: 
+      - rabbitmq
+      - mongodb
     networks:
+      - frontend
       - backend
+    command: nodemon app.js # Dev Mode
+
+  server2:
+    container_name: server-2
+    restart: always
+    build: ./server-2
+    volumes: # Dev Mode
+      - ./server-2/:/usr/src/app/ # Dev Mode
     ports:
-      - "8081:8081"
-    volumes:
-      - ./node-app2:/usr/src/app
-    environment:
-      WAIT_HOSTS: rabbitmq:5672, mongo:27017
-      WAIT_AFTER_HOSTS : 20
-    command: sh -c "/wait && npm install && npm run dev"          
-
-
-  web-cli1:
-    image: node-app1
+      - "5002:5002"
+    depends_on: 
+      - server1
     networks:
       - backend
-    command: sh
+    command: nodemon app.js # Dev Mode
 
-  web-cli2:
-    image: node-app2
-    networks:
-      - backend
-    command: sh
+  # sandwich-app:
+  #   container_name: sandwich-app
+  #   restart: always
+  #   build: ./sandwich-app
+  #   volumes:
+  #     - ./sandwich-app/:/app/
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on: 
+  #     - server1
+  #   networks:
+  #     - frontend
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true
+  #   stdin_open: true
 
 networks:
   backend:
+    driver: bridge
+  frontend:
     driver: bridge

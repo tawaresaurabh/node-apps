@@ -1,29 +1,17 @@
 const mongoose = require('mongoose');
 
 /**
- * Get database connect URL.
- *
- * Reads URL from DBURL environment variable or
- * returns default URL if variable is not defined
- *
- * @returns {string} connection URL
+ * Open connection to Mongodb for CRUD operations
+ * 
+ * @throws { Error } if unsuccessfull
+ * @returns { void }
+ * 
  */
-const getDbUrl = () => {
-  // TODO: 9.3 Implement this
-  return 'mongodb://mongo:27017/OrderManagement';
-
-  //mongoose.connect('mongodb://username:password@host:port/database');
-  
-};
-
-/**
- * Connects mongo database
- */
-function connectDB () {
+function connectDB (dbURL) {
   // Do nothing if already connected
   if (!mongoose.connection || mongoose.connection.readyState === 0) {
     mongoose
-      .connect(getDbUrl(), {
+      .connect(dbURL, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false,
@@ -39,13 +27,15 @@ function connectDB () {
       })
       .catch(handleCriticalError);
   }
-  console.log('connection good!');
 }
 
 /**
- * Handles errors in mongo db
+ * Closes connection to Mongodb
  * 
- * @param {string} err error message
+ * @param { Error} err - Mongodn connection error object
+ * @throws { Error } 
+ * @returns { void }
+ * 
  */
 function handleCriticalError (err) {
   console.error(err);
@@ -53,10 +43,14 @@ function handleCriticalError (err) {
 }
 
 /**
- * Disconnects from mongo database
+ * Throws error on catch when connecting to Mongodb
+ * 
+ * @throws { Error } if unsuccessfull
+ * @returns { void }
+ * 
  */
 function disconnectDB () {
   mongoose.disconnect();
 }
 
-module.exports = { connectDB, disconnectDB, getDbUrl };
+module.exports = { connectDB, disconnectDB};
