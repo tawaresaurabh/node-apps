@@ -38,7 +38,7 @@ app.use("/test", (req, res) => {
 			Buffer.from(JSON.stringify({ data }))
 		);
 	});
-	console.log(`Server 1 sent ${{data}} to server 2`);
+	console.log("Server 1 sent", {data}, " to server 2");
 	res.end();
 });
 app.use("/order", orderRouter);
