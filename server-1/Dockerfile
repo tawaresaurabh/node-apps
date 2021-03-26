@@ -18,7 +18,9 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-
 EXPOSE 5001
 
-CMD [ "npm", "start" ]
+# Get wait for container script
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.8.0/wait /wait
+
+RUN chmod +x /wait

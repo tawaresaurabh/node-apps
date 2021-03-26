@@ -25,16 +25,16 @@ services:
       - ./server-1/:/usr/src/app/ # Dev Mode
     ports:
       - "5001:5001"
-    environment:
-      WAIT_HOSTS: rabbitmq:5672, mongodb:27017
-      WAIT_AFTER_HOSTS : 20 
     depends_on: 
       - rabbitmq
       - mongodb
     networks:
       - frontend
       - backend
-    command: nodemon app.js # Dev Mode
+    environment:
+      WAIT_HOSTS: mongodb:27017, rabbitmq:5672
+      WAIT_AFTER_HOSTS : 5
+    command: sh -c "/wait && nodemon app.js" # Dev Mode
 
   server2:
     container_name: server-2
@@ -48,7 +48,10 @@ services:
       - server1
     networks:
       - backend
-    command: nodemon app.js # Dev Mode
+    environment:
+      WAIT_HOSTS: server1:5001
+      WAIT_AFTER_HOSTS : 1
+    command: sh -c "/wait && nodemon app.js"# Dev Mode
 
   # sandwich-app:
   #   container_name: sandwich-app
