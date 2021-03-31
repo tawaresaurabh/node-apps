@@ -31,7 +31,7 @@ app.get('/', (req, res) => {
 
 async function init() {
     connectDB();
-    const conn = await require('amqplib').connect('amqp://rabbitmq:5672');
+    const conn = await require('amqplib').connect('amqp://localhost:5672');
     const ch = await conn.createChannel();
     channel = ch;
 

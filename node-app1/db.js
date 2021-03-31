@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
  */
 const getDbUrl = () => {
   // TODO: 9.3 Implement this
-  return 'mongodb://mongo:27017/OrderManagement';
+  return 'mongodb://localhost:27017/OrderManagement';
 
   //mongoose.connect('mongodb://username:password@host:port/database');
 
